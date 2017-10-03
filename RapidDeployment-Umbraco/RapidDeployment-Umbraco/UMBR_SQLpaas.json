@@ -2,147 +2,234 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Server Name": {
-      "defaultValue": "pooldemoserver",
+    "administratorLogin": {
       "type": "string",
       "metadata": {
-        "description": "Name of the SQL:  needs to be unique among all servers in Azure"
+        "description": "The SQL Server administrator login"
       }
     },
-    "Admin Login": {
-      "defaultValue": "myadmin",
-      "type": "string",
-      "metadata": {
-        "description": "SQL Server Admin login name"
-      }
-    },
-    "Admin Password": {
+    "administratorLoginPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "SQL Server Admin login password"
+        "description": "The SQL Server administrator login password."
       }
     },
-    "Pool A Edition": {
-      "defaultValue": "Standard",
+    "serverName": {
       "type": "string",
+      "metadata": {
+        "description": "The SQL Server name."
+      }
+    },
+    "elasticPoolName": {
+      "type": "string",
+      "metadata": {
+        "description": "The Elastic Pool name."
+      }
+    },
+    "edition": {
+      "type": "string",
+      "defaultValue": "Standard",
       "allowedValues": [
         "Basic",
         "Standard",
         "Premium"
       ],
       "metadata": {
-        "description": "Pool A Edition"
+        "description": "The Elastic Pool edition."
       }
     },
-    "DB Max Size": {
-      "defaultValue": "10737418240",
-      "type": "string",
-      "allowedValues": [
-        "104857600",
-        "524288000",
-        "1073741824",
-        "2147483648",
-        "5368709120",
-        "10737418240",
-        "21474836480",
-        "32212254720",
-        "42949672960",
-        "53687091200",
-        "107374182400",
-        "161061273600",
-        "214748364800",
-        "268435456000",
-        "322122547200",
-        "429496729600",
-        "536870912000"
+    "poolDtu": {
+      "type": "int",
+      "metadata": {
+        "description": "The Elastic Pool DTU."
+      }
+    },
+    "databaseDtuMin": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "The Elastic Pool database DTU min."
+      }
+    },
+    "databaseDtuMax": {
+      "type": "int",
+      "metadata": {
+        "description": "The Elastic Pool database DTU max."
+      }
+    },
+    "databaseNames": {
+      "type": "array",
+      "defaultValue": [
+        "db1",
+        "db2"
       ],
       "metadata": {
-        "description": "DB Max Size, in bytes"
+        "description": "The SQL Databases names. Cannot be master, tempdb, msdb or msdb."
       }
     },
-    "elasticPoolName": {
+    "transparentDataEncryption": {
       "type": "string",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
+      "defaultValue": "Enabled",
       "metadata": {
-        "description": "Elastic Pool Name"
+        "description": "Enable or disable Transparent Data Encryption (TDE) for the database."
       }
     },
-    "dbName01": {
+    "databaseCollation": {
       "type": "string",
-      "metadata": {
-        "description": "Database Name"
-      }
-    },
-    "dbCollation01": {
       "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+      "metadata": {
+        "description": "The SQL Database collation."
+      }
+    },
+    "environment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "Test",
+        "Development",
+        "Disaster Recovery",
+        "Q/A",
+        "Other"
+      ],
+      "metadata": {
+        "description": "The Environment type we are building",
+        "group": "Tags",
+        "order": 1,
+        "question": "Please enter environment type : "
+      },
+      "defaultValue": "Production"
+    },
+    "buildDate": {
       "type": "string",
       "metadata": {
-        "description": "Database 1 collation"
-      }
+        "description": "The date of this build",
+        "group": "Tags",
+        "order": 2,
+        "question": "Please enter todays date (mm/dd/yyyy) : "
+      },
+      "defaultValue": "mm/dd/yyyy"
+    },
+    "buildBy": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the person who build this environment",
+        "group": "Tags",
+        "order": 3,
+        "question": "Please enter your full name : "
+      },
+      "defaultValue": "First Last"
     }
   },
-  "variables": {
-    "Pool A": "[parameters('elasticPoolName')]"
-  },
+  "variables": {},
   "resources": [
     {
-      "name": "[parameters('Server Name')]",
-      "type": "Microsoft.Sql/servers",
       "apiVersion": "2014-04-01-preview",
       "location": "[resourceGroup().location]",
-      "dependsOn": [],
+      "name": "[concat(parameters('serverName'))]",
       "properties": {
-        "administratorLogin": "[parameters('Admin Login')]",
-        "administratorLoginPassword": "[parameters('Admin Password')]",
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
         "version": "12.0"
       },
-      "resources": [
-        {
-          "type": "firewallRules",
-          "kind": "v12.0",
-          "name": "AllowAllAzureIps",
-          "apiVersion": "2014-04-01-preview",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('Server Name'))]"
-          ],
-          "properties": {
-            "startIpAddress": "0.0.0.0",
-            "endIpAddress": "0.0.0.0"
-          }
-        },
-        {
-          "type": "elasticpools",
-          "name": "[variables('Pool A')]",
-          "apiVersion": "2014-04-01-preview",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('Server Name'))]"
-          ],
-          "properties": {
-            "edition": "[parameters('Pool A Edition')]",
-            "dtu": 50,
-            "databaseDtuMin": 0,
-            "databaseDtuMax": 50,
-            "storageMB": 51200
-          }
-        }
-      ]
+      "type": "Microsoft.Sql/servers",
+      "tags": {
+        "displayName": "SqlServer",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      }
+    },
+    {
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [
+        "[concat('Microsoft.Sql/servers/', parameters('serverName'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "name": "[concat(parameters('serverName'), '/', parameters('elasticPoolName'))]",
+      "properties": {
+        "edition": "[parameters('edition')]",
+        "dtu": "[parameters('poolDtu')]",
+        "databaseDtuMin": "[parameters('databaseDtuMin')]",
+        "databaseDtuMax": "[parameters('databaseDtuMax')]"
+      },
+      "type": "Microsoft.Sql/servers/elasticpools",
+      "tags": {
+        "displayName": "Elastic Pool",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      }
     },
     {
       "type": "Microsoft.Sql/servers/databases",
-      "name": "[concat(parameters('Server Name'),'/',parameters('dbName01'))]",
+      "name": "[concat(parameters('serverName'), '/', parameters('databaseNames')[copyIndex()])]",
       "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', parameters('Server Name'))]",
-        "[resourceId('Microsoft.Sql/servers/elasticpools', parameters('Server Name'), variables('Pool A'))]"
-      ],
       "apiVersion": "2014-04-01-preview",
+      "dependsOn": [
+        "[concat('Microsoft.Sql/servers/', parameters('serverName'))]",
+        "[concat('Microsoft.Sql/servers/', parameters('serverName'),'/elasticpools/', parameters('elasticPoolName'))]"
+      ],
+      "tags": {
+        "displayName": "Database",
+        "Environment": "[parameters('environment')]",
+        "BuildDate": "[parameters('buildDate')]",
+        "BuildBy": "[parameters('buildBy')]"
+      },
       "properties": {
-        "collation": "[parameters('dbCollation01')]",
-        "maxSizeBytes": "[parameters('DB Max Size')]",
+        "collation": "[parameters('databaseCollation')]",
         "requestedServiceObjectiveName": "ElasticPool",
-        "elasticPoolName": "[variables('Pool A')]"
+        "elasticPoolName": "[concat(parameters('elasticPoolName'))]"
+      },
+      "resources": [
+        {
+          "comments": "Transparent Data Encryption",
+          "name": "current",
+          "type": "transparentDataEncryption",
+          "apiVersion": "2014-04-01",
+          "properties": {
+            "status": "[parameters('transparentDataEncryption')]"
+          },
+          "dependsOn": [
+            "[parameters('databaseNames')[copyIndex()]]"
+          ]
+        }
+      ],
+      "copy": {
+        "name": "addDatabasesInElasticPool",
+        "count": "[length(parameters('databaseNames'))]"
       }
+    },
+    {
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [
+        "[concat('Microsoft.Sql/servers/', parameters('serverName'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "name": "[concat(parameters('serverName'), '/AllowAllWindowsAzureIps')]",
+      "properties": {
+        "endIpAddress": "0.0.0.0",
+        "startIpAddress": "0.0.0.0"
+      },
+      "type": "Microsoft.Sql/servers/firewallrules"
     }
-  ]
+  ],
+  "outputs": {
+    "sqlServerFqdn": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Sql/servers/', parameters('serverName'))).fullyQualifiedDomainName]"
+    },
+    "databaseName": {
+      "type": "array",
+      "value": "[array(parameters('databaseNames'))]"
+    },
+    "transparentDataEncryption": {
+      "type": "string",
+      "value": "[parameters('transparentDataEncryption')]"
+    }
+  }
 }
