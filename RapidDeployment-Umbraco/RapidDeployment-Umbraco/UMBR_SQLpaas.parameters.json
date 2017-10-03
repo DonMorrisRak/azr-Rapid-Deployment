@@ -2,16 +2,16 @@
   "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Server Name": {
+    "ServerName": {
       "value": "neu-umbraco-mssql-server-cst-prd"
     },
-    "Admin Login": {
+    "AdminLogin": {
       "value": "cst-adminprd"
     },
-    "Pool A Edition": {
+    "PoolAEdition": {
       "value": "Basic"
     },
-    "DB Max Size": {
+    "DBMaxSize": {
       "value": "53687091200"
     },
     "elasticPoolName": {

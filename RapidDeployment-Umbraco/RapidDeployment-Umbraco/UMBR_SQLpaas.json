@@ -2,27 +2,27 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Server Name": {
+    "ServerName": {
       "defaultValue": "pooldemoserver",
       "type": "string",
       "metadata": {
         "description": "Name of the SQL:  needs to be unique among all servers in Azure"
       }
     },
-    "Admin Login": {
+    "AdminLogin": {
       "defaultValue": "myadmin",
       "type": "string",
       "metadata": {
         "description": "SQL Server Admin login name"
       }
     },
-    "Admin Password": {
+    "AdminPassword": {
       "type": "securestring",
       "metadata": {
         "description": "SQL Server Admin login password"
       }
     },
-    "Pool A Edition": {
+    "PoolAEdition": {
       "defaultValue": "Standard",
       "type": "string",
       "allowedValues": [
@@ -34,7 +34,7 @@
         "description": "Pool A Edition"
       }
     },
-    "DB Max Size": {
+    "DBMaxSize": {
       "defaultValue": "10737418240",
       "type": "string",
       "allowedValues": [
@@ -85,14 +85,14 @@
   },
   "resources": [
     {
-      "name": "[parameters('Server Name')]",
+      "name": "[parameters('ServerName')]",
       "type": "Microsoft.Sql/servers",
       "apiVersion": "2014-04-01-preview",
       "location": "[resourceGroup().location]",
       "dependsOn": [],
       "properties": {
-        "administratorLogin": "[parameters('Admin Login')]",
-        "administratorLoginPassword": "[parameters('Admin Password')]",
+        "administratorLogin": "[parameters('AdminLogin')]",
+        "administratorLoginPassword": "[parameters('AdminPassword')]",
         "version": "12.0"
       },
       "resources": [
@@ -103,7 +103,7 @@
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('Server Name'))]"
+            "[resourceId('Microsoft.Sql/servers', parameters('ServerName'))]"
           ],
           "properties": {
             "startIpAddress": "0.0.0.0",
@@ -116,10 +116,10 @@
           "apiVersion": "2014-04-01-preview",
           "location": "[resourceGroup().location]",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', parameters('Server Name'))]"
+            "[resourceId('Microsoft.Sql/servers', parameters('ServerName'))]"
           ],
           "properties": {
-            "edition": "[parameters('Pool A Edition')]",
+            "edition": "[parameters('PoolAEdition')]",
             "dtu": 50,
             "databaseDtuMin": 0,
             "databaseDtuMax": 50,
@@ -130,16 +130,16 @@
     },
     {
       "type": "Microsoft.Sql/servers/databases",
-      "name": "[concat(parameters('Server Name'),'/',parameters('dbName01'))]",
+      "name": "[concat(parameters('ServerName'),'/',parameters('dbName01'))]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', parameters('Server Name'))]",
-        "[resourceId('Microsoft.Sql/servers/elasticpools', parameters('Server Name'), variables('Pool A'))]"
+        "[resourceId('Microsoft.Sql/servers', parameters('ServerName'))]",
+        "[resourceId('Microsoft.Sql/servers/elasticpools', parameters('ServerName'), variables('Pool A'))]"
       ],
       "apiVersion": "2014-04-01-preview",
       "properties": {
         "collation": "[parameters('dbCollation01')]",
-        "maxSizeBytes": "[parameters('DB Max Size')]",
+        "maxSizeBytes": "[parameters('DBMaxSize')]",
         "requestedServiceObjectiveName": "ElasticPool",
         "elasticPoolName": "[variables('Pool A')]"
       }
