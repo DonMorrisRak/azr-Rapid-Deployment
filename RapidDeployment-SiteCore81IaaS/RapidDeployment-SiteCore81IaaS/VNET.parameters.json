@@ -1,0 +1,75 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "value": "VNET01"
+    },
+    "vnetCIDR": {
+      "value": "172.16.192.0/22"
+    },
+    "environmentA": {
+      "value": "Production"
+    },
+    "subnetCDCIDRA": {
+      "value": "172.16.192.32/27"
+    },
+    "subnetCMSCIDRA": {
+      "value": "172.16.192.16/28"
+    },
+    "subnetSQLCIDRA": {
+      "value": "172.16.192.80/28"
+    },
+    "subnetSOLRCIDRA": {
+      "value": "172.16.192.64/28"
+    },
+    "subnetADCIDRA": {
+      "value": "172.16.192.0/28"
+    },
+    "subnetBASCIDR": {
+      "value": "172.16.192.240/29"
+    },
+    "subnetCBASCIDR": {
+      "value": "172.16.192.248/29"
+    },
+    "subnetAGWCIDRA": {
+      "value": "172.16.192.96/28"
+    },
+    "subnetGWCIDR": {
+      "value": "172.16.195.224/27"
+    },
+    "environmentB": {
+      "value": "Development"
+    },
+    "subnetCDCIDRB": {
+      "value": "172.16.192.112/28"
+    },
+    "subnetSQLCIDRB": {
+      "value": "172.16.192.128/28"
+    },
+    "environmentC": {
+      "value": "Q/A"
+    },
+    "subnetCDCIDRC": {
+      "value": "172.16.192.160/27"
+    },
+    "subnetAPPCIDRC": {
+      "value": "172.16.192.144/28"
+    },
+    "subnetSQLCIDRC": {
+      "value": "172.16.192.208/28"
+    },
+    "subnetSOLRCIDRC": {
+      "value": "172.16.192.192/28"
+    },
+    "subnetAGWCIDRC": {
+      "value": "172.16.192.224/28"
+    },
+    "buildDate": {
+      "value": "19 September 2017"
+    },
+    "buildBy": {
+      "value": "Don Morris"
+    }
+  }
+}

@@ -1,0 +1,88 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "redisCacheName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Redis Cache to create."
+      }
+    },
+    "redisCacheTier": {
+      "type": "string",
+      "defaultValue": "Premium",
+      "allowedValues": [
+        "Premium",
+        "Standard",
+        "Basic"
+      ],
+      "metadata": {
+        "description": "The Tier of the Azure Redis Cache to create"
+      }
+    },
+    "redisCacheFamily": {
+      "type": "string",
+      "defaultValue": "P",
+      "allowedValues": [
+        "P",
+        "C"
+      ],
+      "metadata": {
+        "description": "The Family of the Azure Redis Cache to create"
+      }
+    },
+    "redisCacheCapacity": {
+      "type": "int",
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "defaultValue": 1,
+      "metadata": {
+        "description": "The size of the new Azure Redis Cache instance. Valid family and capacity combinations are (C0..C6, P1..P4)."
+      }
+    },
+    "enableNonSslPort": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Set to true to allow access to redis on port 6379, without SSL tunneling (less secure)."
+      }
+    }
+  },
+  "variables": {
+    
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[parameters('redisCacheName')]",
+      "type": "Microsoft.Cache/Redis",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "enableNonSslPort": "[parameters('enableNonSslPort')]",
+        "sku": {
+          "capacity": "[parameters('redisCacheCapacity')]",
+          "family": "[parameters('redisCacheFamily')]",
+          "name": "[parameters('redisCacheTier')]"
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-07-01",
+          "name": "[concat(parameters('redisCacheName'), '/Microsoft.Insights/service')]",
+          "type": "Microsoft.Cache/redis/providers/diagnosticsettings",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Cache/Redis/', parameters('redisCacheName'))]",
+          ],
+          "properties": {
+            "status": "ON"          }
+        }
+      ]
+    }
+  ]
+}

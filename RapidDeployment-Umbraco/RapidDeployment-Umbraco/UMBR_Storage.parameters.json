@@ -1,0 +1,33 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountType": {
+      "value": "Standard_LRS"
+    },
+    "storageAccountCount": {
+      "value": 2
+    },
+    "startIndex": {
+      "value": 1
+    },
+    "storageAccountSuffix": {
+      "value": "ubmrcstname"
+    },
+    "blobEncryptionEnabled": {
+      "value": true
+    },
+    "accessTier": {
+      "value": "Hot"
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": ""
+    },
+    "buildBy": {
+      "value": ""
+    }
+  }
+}

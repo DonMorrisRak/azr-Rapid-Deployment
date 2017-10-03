@@ -1,0 +1,117 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "operatingSystem": {
+      "value": "Windows Server 2012 R2"
+    },
+    "vmNamePrefix": {
+      "value": "QA-VM-SOLR-"
+    },
+    "vmSize": {
+      "value": "Standard_D11v2"
+    },
+    "vmCount": {
+      "value": 1
+    },
+    "startIndex": {
+      "value": 1
+    },
+    "adminPassword": {
+      "value": ""
+    },
+    "availabilitySetOption": {
+      "value": "New"
+    },
+    "availabilitySetName": {
+      "value": "QA-AS-SOLR"
+    },
+    "storageAccountOption": {
+      "value": "New"
+    },
+    "existingStorageAccount": {
+      "value": ""
+    },
+    "storageAccountType": {
+      "value": "Standard_LRS"
+    },
+    "numDataDisks": {
+      "value": 0
+    },
+    "dataDiskSize": {
+      "value": 127
+    },
+    "diskCaching": {
+      "value": "None"
+    },
+    "vnetRG": {
+      "value": "NEU-STCR-RSG-ALL-PRD"
+    },
+    "vnetName": {
+      "value": "NEU-VNET01"
+    },
+    "subnetName": {
+      "value": "NEU-VNET01-SOLR-QA"
+    },
+    "lbOption": {
+      "value": "None"
+    },
+    "dnsLabel": {
+      "value": ""
+    },
+    "joinADDomain": {
+      "value": "No"
+    },
+    "domainToJoin": {
+      "value": "clouddomain.com"
+    },
+    "organizationalUnit": {
+      "value": ""
+    },
+    "domainAdminUsername": {
+      "value": "administrator"
+    },
+    "domainAdminPassword": {
+      "value": ""
+    },
+    "deployWebServer": {
+      "value": "None"
+    },
+    "timeZone": {
+      "value": "(UTC) UTC"
+    },
+    "applyOSPatches": {
+      "value": "Yes"
+    },
+    "antiMalware": {
+      "value": "Yes"
+    },
+    "logAnalytics": {
+      "value": "Yes"
+    },
+    "workspaceId": {
+      "value": ""
+    },
+    "workspaceKey": {
+      "value": ""
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "19 September 2017"
+    },
+    "buildBy": {
+      "value": "Don Morris"
+    },
+    "RaxAutomationExclude": {
+      "value": "None"
+    },
+    "assetLocation": {
+      "value": "https://raxtemplates.blob.core.windows.net/master/"
+    },
+    "sasToken": {
+      "value": ""
+    }
+  }
+}

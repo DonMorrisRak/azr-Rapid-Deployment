@@ -1,0 +1,51 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AppServicePlanName": {
+      "value": "NEU-UMBRACO-ASP-CST-PRD"
+    },
+    "WebAppName1": {
+      "value": "NEU-UMBRACO-WEBAPP-CST-PRD"
+    },
+    "skuName": {
+      "value": "S2"
+    },
+    "skuCapacity": {
+      "value": 2
+    },
+    "netFrameworkVersion": {
+      "value": "v4.6"
+    },
+    "phpVersion": {
+      "value": "Off"
+    },
+    "pythonVersion": {
+      "value": "Off"
+    },
+    "32Bit": {
+      "value": "false"
+    },
+    "webSockets": {
+      "value": "true"
+    },
+    "alwaysOn": {
+      "value": "true"
+    },
+    "webServerLogging": {
+      "value": "true"
+    },
+    "detailedErrors": {
+      "value": "true"
+    },
+    "failedRequestTrace": {
+      "value": "true"
+    },
+    "clientAffinityEnabled": {
+      "value": "false"
+    },
+    "logSize": {
+      "value": 25
+    }
+  }
+}

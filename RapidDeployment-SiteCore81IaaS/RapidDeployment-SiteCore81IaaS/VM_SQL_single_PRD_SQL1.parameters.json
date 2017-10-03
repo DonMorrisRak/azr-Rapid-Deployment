@@ -1,0 +1,102 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "operatingSystem": {
+      "value": "Windows 2012 R2 SQL Server 2014 SP2 Standard"
+    },
+    "vmName": {
+      "value": "PRD-VM-SQL-1"
+    },
+    "vmSize": {
+      "value": "Standard_DS11_v2"
+    },
+    "adminPassword": {
+      "value": "Secur3string!!"
+    },
+    "availabilitySetOption": {
+      "value": "New"
+    },
+    "availabilitySetName": {
+      "value": "PRD-AS-SQL"
+    },
+    "storageAccountOption": {
+      "value": "New"
+    },
+    "existingStorageAccount": {
+      "value": ""
+    },
+    "storageAccountType": {
+      "value": "Premium_LRS"
+    },
+    "numDataDisks": {
+      "value": 2
+    },
+    "dataDiskSize": {
+      "value": 127
+    },
+    "diskCaching": {
+      "value": "None"
+    },
+    "vnetRG": {
+      "value": "NEU-STCR-RSG-ALL-PRD"
+    },
+    "vnetName": {
+      "value": "NEU-VNET01"
+    },
+    "subnetName": {
+      "value": "NEU-VNET01-SQL-PRD"
+    },
+    "joinADDomain": {
+      "value": "No"
+    },
+    "domainToJoin": {
+      "value": "clouddomain.com"
+    },
+    "organizationalUnit": {
+      "value": ""
+    },
+    "domainAdminUsername": {
+      "value": "administrator"
+    },
+    "domainAdminPassword": {
+      "value": ""
+    },
+    "timeZone": {
+      "value": "(UTC) UTC"
+    },
+    "applyOSPatches": {
+      "value": "Yes"
+    },
+    "antiMalware": {
+      "value": "Yes"
+    },
+    "logAnalytics": {
+      "value": "Yes"
+    },
+    "workspaceId": {
+      "value": ""
+    },
+    "workspaceKey": {
+      "value": ""
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "19 September 2017"
+    },
+    "buildBy": {
+      "value": "Don Morris"
+    },
+    "RaxAutomationExclude": {
+      "value": "None"
+    },
+    "assetLocation": {
+      "value": "https://raxtemplates.blob.core.windows.net/master/"
+    },
+    "sasToken": {
+      "value": ""
+    }
+  }
+}

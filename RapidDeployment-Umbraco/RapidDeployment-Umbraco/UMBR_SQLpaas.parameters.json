@@ -1,0 +1,27 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Server Name": {
+      "value": "neu-umbraco-mssql-server-cst-prd"
+    },
+    "Admin Login": {
+      "value": "cst-adminprd"
+    },
+    "Pool A Edition": {
+      "value": "Basic"
+    },
+    "DB Max Size": {
+      "value": "53687091200"
+    },
+    "elasticPoolName": {
+      "value": "neu-umbraco-mssql-pool-cst-prd"
+    },
+    "dbName01": {
+      "value": "neu-umbraco-db-dbname-cst-prd"
+    },
+    "dbCollation01": {
+      "value": "SQL_Latin1_General_CP1_CI_AS"
+    }
+  }
+}

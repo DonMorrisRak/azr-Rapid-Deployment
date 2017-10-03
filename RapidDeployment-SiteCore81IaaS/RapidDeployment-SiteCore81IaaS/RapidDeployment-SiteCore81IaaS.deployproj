@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|AnyCPU">
+      <Configuration>Debug</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|AnyCPU">
+      <Configuration>Release</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>ff806cbb-c274-430d-bee7-109d45c1fc1c</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkIdentifier>Deployment</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>1.0</TargetFrameworkVersion>
+    <PrepareForBuildDependsOn>
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+  <Import Condition=" Exists('Deployment.targets') " Project="Deployment.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <!-- vertag<:>start tokens<:>maj.min -->
+  <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
+  <!-- vertag<:>end -->
+  <ItemGroup>
+    <None Include="AGW.json" />
+    <None Include="AGW_QA.parameters.json" />
+    <None Include="AGW_PRD.parameters.json" />
+    <None Include="Deployment.targets">
+      <Visible>False</Visible>
+    </None>
+    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <None Include="Domain_Services_multi.json" />
+    <None Include="Domain_Services_multi.parameters.json" />
+    <None Include="OMS.json" />
+    <None Include="OMS.parameters.json" />
+    <None Include="VM_multi_DEV_CDCMS.parameters.json" />
+    <None Include="VM_multi_PRD_CBT.parameters.json" />
+    <None Include="VM_multi_QA_SOLR.parameters.json" />
+    <None Include="VM_multi_QA_CMS.parameters.json" />
+    <None Include="VM_multi_QA_CD.parameters.json" />
+    <None Include="VM_multi_PRD_CD.parameters.json" />
+    <None Include="VM_multi.json" />
+    <None Include="VM_multi_PRD_CMS.parameters.json" />
+    <None Include="VM_multi_PRD_WIT.parameters.json" />
+    <None Include="VM_multi_PRD_SOLR.parameters.json" />
+    <None Include="VM_SQL_single.json" />
+    <None Include="VM_SQL_single_DEV_SQL1.parameters.json" />
+    <None Include="VM_SQL_single_QA_SQL1.parameters.json" />
+    <None Include="VM_SQL_single_PRD_SQL2.parameters.json" />
+    <None Include="VM_SQL_single_PRD_SQL1.parameters.json" />
+    <None Include="VNET.json" />
+    <None Include="VNET.parameters.json" />
+  </ItemGroup>
+  <Target Name="GetReferenceAssemblyPaths" />
+</Project>

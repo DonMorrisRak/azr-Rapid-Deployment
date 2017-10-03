@@ -1,0 +1,184 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AppServicePlanName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "WebAppName1": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "netFrameworkVersion": {
+      "type": "string",
+      "defaultValue": "v4.6",
+      "allowedValues": [
+        "v3.5",
+        "v4.6"
+      ]
+    },
+    "phpVersion": {
+      "type": "string",
+      "defaultValue": "Off",
+      "allowedValues": [
+        "Off",
+        "5.5",
+        "5.6",
+        "7.0",
+        "7.1"
+      ]
+    },
+    "pythonVersion": {
+      "type": "string",
+      "defaultValue": "Off",
+      "allowedValues": [
+        "Off",
+        "2.7",
+        "3.4"
+      ]
+    },
+    "32Bit": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "webSockets": {
+      "type": "string",
+      "defaultValue": "false",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "alwaysOn": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "webServerLogging": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "detailedErrors": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "failedRequestTrace": {
+      "type": "string",
+      "defaultValue": "true",
+      "allowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "clientAffinityEnabled": {
+      "type": "string",
+      "defaultValue": "false"
+    },
+    "logSize": {
+      "type": "int",
+      "defaultValue": 25,
+      "minValue": 25,
+      "maxValue": 100
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "name": "[parameters('AppServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "AppServicePlan"
+      },
+      "properties": {
+        "name": "[parameters('AppServicePlanName')]"
+      }
+    },
+    {
+      "name": "[parameters('WebAppName1')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName')))]": "Resource",
+        "displayName": "WebAppName"
+      },
+      "properties": {
+        "name": "[parameters('WebAppName1')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
+        "siteConfig": {
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
+          "PhpVersion": "[parameters('phpVersion')]",
+          "pythonVersion": "[parameters('pythonVersion')]",
+          "use32BitWorkerProcess": "[parameters('32Bit')]",
+          "webSocketsEnabled": "[parameters('webSockets')]",
+          "alwaysOn": "[parameters('alwaysOn')]",
+          "requestTracingEnabled": "[parameters('failedRequestTrace')]",
+          "httpLoggingEnabled": "[parameters('webServerLogging')]",
+          "logsDirectorySizeLimit": "[parameters('logSize')]",
+          "detailedErrorLoggingEnabled": "[parameters('detailedErrors')]"
+        },
+        "clientAffinityEnabled": "[parameters('clientAffinityEnabled')]"
+      }
+    }
+  ],
+  "outputs": {}
+}
