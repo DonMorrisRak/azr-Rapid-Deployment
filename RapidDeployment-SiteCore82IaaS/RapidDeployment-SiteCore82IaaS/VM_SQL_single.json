@@ -1,0 +1,1455 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "operatingSystem": {
+      "type": "string",
+      "metadata": {
+        "description": "The Operating System for the VM",
+        "group": "Basic Settings",
+        "order": 1,
+        "label": "Operating System",
+        "question": "What operating system do you want to deploy?",
+        "skip": "never"
+      },
+      "allowedValues": [
+        "Windows 2012 R2 SQL Server 2014 SP2 Express",
+        "Windows 2012 R2 SQL Server 2014 SP2 Web",
+        "Windows 2012 R2 SQL Server 2014 SP2 Standard",
+        "Windows 2012 R2 SQL Server 2014 SP2 Standard - BYOL",
+        "Windows 2012 R2 SQL Server 2014 SP2 Enterprise",
+        "Windows 2012 R2 SQL Server 2014 SP2 Enterprise - BYOL",
+        "Windows 2012 R2 SQL Server 2016 Express",
+        "Windows 2012 R2 SQL Server 2016 Web",
+        "Windows 2012 R2 SQL Server 2016 Standard",
+        "Windows 2012 R2 SQL Server 2016 Standard - BYOL",
+        "Windows 2012 R2 SQL Server 2016 Enterprise",
+        "Windows 2012 R2 SQL Server 2016 Enterprise - BYOL",
+        "Windows 2016 SQL Server 2016 SP1 Express",
+        "Windows 2016 SQL Server 2016 SP1 Web",
+        "Windows 2016 SQL Server 2016 SP1 Standard",
+        "Windows 2016 SQL Server 2016 SP1 Standard - BYOL",
+        "Windows 2016 SQL Server 2016 SP1 Enterprise",
+        "Windows 2016 SQL Server 2016 SP1 Enterprise - BYOL"
+      ],
+      "defaultValue": "Windows 2012 R2 SQL Server 2014 SP2 Standard"
+    },
+    "vmName": {
+      "metadata": {
+        "description": "The VM name. Max 14 chars to allow for admin username of the format (vmname-adm)",
+        "group": "Basic Settings",
+        "order": 2,
+        "label": "Name",
+        "question": "What is the name you want to use for this VM? "
+      },
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 14,
+      "defaultValue": "WIN-SQL-01"
+    },
+    "vmSize": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "Standard_DS1_v2",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2",
+        "Standard_F1s",
+        "Standard_F2s",
+        "Standard_F4s",
+        "Standard_F8s",
+        "Standard_F16s",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS5"
+      ],
+      "metadata": {
+        "description": "The size of the virtual machine to create. NOTE: GS series is NOT available on all regions.",
+        "group": "Basic Settings",
+        "order": 3,
+        "label": "Size",
+        "question": "Select VM Size",
+        "skip": "never"
+      }
+    },
+    "adminPassword": {
+      "metadata": {
+        "description": "The password for the admin username (non rack account)",
+        "group": "Basic Settings",
+        "order": 4,
+        "label": "Admin Password",
+        "question": "Admin Password",
+        "skip": "never"
+      },
+      "type": "securestring",
+      "minLength": 8
+    },
+    "availabilitySetOption": {
+      "defaultValue": "New",
+      "metadata": {
+        "description": "Specify if you need the new VMs to belong to a new availability set",
+        "group": "Basic Settings",
+        "order": 5,
+        "label": "Availability Set Option",
+        "question": "Availability Set Option",
+        "skip": "never"
+      },
+      "allowedValues": [
+        "NewOrExisting",
+        "None"
+      ],
+      "type": "string"
+    },
+    "availabilitySetName": {
+      "defaultValue": "AS-WEB-PRD",
+      "metadata": {
+        "description": "Name of new/existing availability set for this VM.",
+        "group": "Basic Settings",
+        "order": 6,
+        "label": "Availability Set Name",
+        "question": "Availability Set Name",
+        "skip": "never"
+      },
+      "type": "string"
+    },
+    "storageAccountOption": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "ManagedDisk"
+      ],
+      "metadata": {
+        "description": "Choose Existing for a pre-created storage account, choosing new will automatically create a new storage account.",
+        "group": "Storage Settings",
+        "order": 1,
+        "label": "Storage Account",
+        "question": "Do you want to use an Existing or New storage account for this VM",
+        "skip": "never"
+      },
+      "defaultValue": "New"
+    },
+    "existingStorageAccount": {
+      "type": "string",
+      "maxLength": 24,
+      "metadata": {
+        "description": "The name of the existing storage account to use (must be on same resource group as this deployment)",
+        "group": "Storage Settings",
+        "order": 2,
+        "label": "Storage Account",
+        "question": "Name of the existing storage account",
+        "skip": "never"
+      },
+      "defaultValue": "existingstorage"
+    },
+    "storageAccountType": {
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Standard_ZRS",
+        "Premium_LRS"
+      ],
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "The type of the Storage Account created",
+        "group": "Storage Settings",
+        "order": 3,
+        "label": "Storage Type",
+        "question": "Type of storage account",
+        "skip": "never"
+      },
+      "type": "string"
+    },
+    "blobEncryptionEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable or disable Blob encryption at Rest."
+      }
+    },
+    "numDataDisks": {
+      "type": "int",
+      "minvalue": 2,
+      "maxValue": 3,
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Numbers of data disks to attach (all will be the same size)",
+        "group": "Storage Settings",
+        "order": 4,
+        "label": "Num. of data disks",
+        "question": "Number of Data Disks to attach",
+        "skip": "never"
+      }
+    },
+    "dataDiskSize": {
+      "type": "int",
+      "minvalue": 32,
+      "maxValue": 4095,
+      "defaultValue": 1023,
+      "metadata": {
+        "description": "The Size of the additional data disks in GB",
+        "group": "Storage Settings",
+        "order": 5,
+        "label": "Size of data disks",
+        "question": "Size of Data Disks to attach",
+        "skip": "never"
+      }
+    },
+    "diskCaching": {
+      "type": "string",
+      "metadata": {
+        "description": "Specify if you want to enable data disk caching",
+        "group": "Storage Settings",
+        "order": 6,
+        "label": "Disk caching",
+        "question": "Disk Caching option",
+        "skip": "never"
+      },
+      "defaultValue": "None",
+      "allowedValues": [
+        "None",
+        "ReadOnly",
+        "ReadWrite"
+      ]
+    },
+    "vnetRG": {
+      "type": "string",
+      "defaultValue": "LOC-RSG-ALL-ENV",
+      "minLength": 1,
+      "metadata": {
+        "description": "The name of the Resource Group where we can find the VNET",
+        "group": "Network Settings",
+        "order": 1,
+        "label": "VNET Resource Group",
+        "question": "Number of Data Disks to attach",
+        "skip": "never"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "LOC-VNET01",
+      "minLength": 1,
+      "metadata": {
+        "description": "Name of an existing VMNetwork",
+        "group": "Network Settings",
+        "order": 2,
+        "label": "VNET Name",
+        "question": "Name of your existing virtual network",
+        "skip": "never"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "LOC-VNET01-INS-ENV",
+      "minLength": 1,
+      "metadata": {
+        "description": "Name of the Subnet inside of the provided VNET where you want to deploy this Virtual Machine.",
+        "group": "Network Settings",
+        "order": 3,
+        "label": "Subnet Name",
+        "question": "Subnet Name",
+        "skip": "never"
+      }
+    },
+    "joinADDomain": {
+      "defaultValue": "No",
+      "metadata": {
+        "description": "Specify if you need the new VMs to join to an existing Active Directory Domain. Windows Only",
+        "group": "Active Directory (Windows Only)",
+        "order": 1,
+        "label": "Join AD Domain",
+        "question": "Join AD domian?",
+        "skip": "never"
+      },
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "type": "string"
+    },
+    "domainToJoin": {
+      "defaultValue": "domaincloud.com",
+      "metadata": {
+        "description": "The name of the domain to join after this VM has been created",
+        "group": "Active Directory (Windows Only)",
+        "order": 2,
+        "label": "Domain Name (FQDN)",
+        "question": "Domain Name (FQDN)",
+        "skip": "never"
+      },
+      "type": "string"
+    },
+    "organizationalUnit": {
+      "defaultValue": "",
+      "metadata": {
+        "description": "The OU to use when joining this machine to the domain. Leave this blank for default's computers OU. Example: OU=Computers,DC=clouddomain,DC=com",
+        "group": "Active Directory (Windows Only)",
+        "order": 2,
+        "label": "OU Path",
+        "question": "Domain Name (FQDN)",
+        "skip": "never"
+      },
+      "type": "string"
+    },
+    "domainAdminUsername": {
+      "type": "string",
+      "defaultValue": "administrator",
+      "metadata": {
+        "description": "Domain Admin username. This account will be used to join the computer to the domain. Do not include domain portion, just username i.e. administrator",
+        "group": "Active Directory (Windows Only)",
+        "order": 3,
+        "label": "Admin Username",
+        "question": "Admin username",
+        "skip": "never"
+      }
+    },
+    "domainAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password of the account on the domain that has access to join computers",
+        "group": "Active Directory (Windows Only)",
+        "order": 4,
+        "label": "Admin Password",
+        "question": "Admin Password",
+        "skip": "never"
+      }
+    },
+    "timeZone": {
+      "type": "string",
+      "defaultValue": "(UTC) UTC",
+      "allowedValues": [
+        "(UTC-12:00) Dateline Standard Time",
+        "(UTC-11:00) UTC-11",
+        "(UTC-10:00) Aleutian Standard Time",
+        "(UTC-10:00) Hawaiian Standard Time",
+        "(UTC-09:30) Marquesas Standard Time",
+        "(UTC-09:00) Alaskan Standard Time",
+        "(UTC-09:00) UTC-09",
+        "(UTC-08:00) Pacific Standard Time (Mexico)",
+        "(UTC-08:00) UTC-08",
+        "(UTC-08:00) Pacific Standard Time",
+        "(UTC-07:00) US Mountain Standard Time",
+        "(UTC-07:00) Mountain Standard Time (Mexico)",
+        "(UTC-07:00) Mountain Standard Time",
+        "(UTC-06:00) Central America Standard Time",
+        "(UTC-06:00) Central Standard Time",
+        "(UTC-06:00) Easter Island Standard Time",
+        "(UTC-06:00) Central Standard Time (Mexico)",
+        "(UTC-06:00) Canada Central Standard Time",
+        "(UTC-05:00) SA Pacific Standard Time",
+        "(UTC-05:00) Eastern Standard Time (Mexico)",
+        "(UTC-05:00) Eastern Standard Time",
+        "(UTC-05:00) Haiti Standard Time",
+        "(UTC-05:00) Cuba Standard Time",
+        "(UTC-05:00) US Eastern Standard Time",
+        "(UTC-04:00) Paraguay Standard Time",
+        "(UTC-04:00) Atlantic Standard Time",
+        "(UTC-04:00) Venezuela Standard Time",
+        "(UTC-04:00) Central Brazilian Standard Time",
+        "(UTC-04:00) SA Western Standard Time",
+        "(UTC-04:00) Pacific SA Standard Time",
+        "(UTC-04:00) Turks And Caicos Standard Time",
+        "(UTC-03:30) Newfoundland Standard Time",
+        "(UTC-03:00) Tocantins Standard Time",
+        "(UTC-03:00) E. South America Standard Time",
+        "(UTC-03:00) SA Eastern Standard Time",
+        "(UTC-03:00) Argentina Standard Time",
+        "(UTC-03:00) Greenland Standard Time",
+        "(UTC-03:00) Montevideo Standard Time",
+        "(UTC-03:00) Saint Pierre Standard Time",
+        "(UTC-03:00) Bahia Standard Time",
+        "(UTC-02:00) UTC-02",
+        "(UTC-02:00) Mid-Atlantic Standard Time",
+        "(UTC-01:00) Azores Standard Time",
+        "(UTC-01:00) Cape Verde Standard Time",
+        "(UTC) UTC",
+        "(UTC+00:00) Morocco Standard Time",
+        "(UTC+00:00) GMT Standard Time",
+        "(UTC+00:00) Greenwich Standard Time",
+        "(UTC+01:00) W. Europe Standard Time",
+        "(UTC+01:00) Central Europe Standard Time",
+        "(UTC+01:00) Romance Standard Time",
+        "(UTC+01:00) Central European Standard Time",
+        "(UTC+01:00) W. Central Africa Standard Time",
+        "(UTC+01:00) Namibia Standard Time",
+        "(UTC+02:00) Jordan Standard Time",
+        "(UTC+02:00) GTB Standard Time",
+        "(UTC+02:00) Middle East Standard Time",
+        "(UTC+02:00) Egypt Standard Time",
+        "(UTC+02:00) E. Europe Standard Time",
+        "(UTC+02:00) Syria Standard Time",
+        "(UTC+02:00) West Bank Standard Time",
+        "(UTC+02:00) South Africa Standard Time",
+        "(UTC+02:00) FLE Standard Time",
+        "(UTC+02:00) Israel Standard Time",
+        "(UTC+02:00) Kaliningrad Standard Time",
+        "(UTC+02:00) Libya Standard Time",
+        "(UTC+03:00) Arabic Standard Time",
+        "(UTC+03:00) Turkey Standard Time",
+        "(UTC+03:00) Arab Standard Time",
+        "(UTC+03:00) Belarus Standard Time",
+        "(UTC+03:00) Russian Standard Time",
+        "(UTC+03:00) E. Africa Standard Time",
+        "(UTC+03:30) Iran Standard Time",
+        "(UTC+04:00) Arabian Standard Time",
+        "(UTC+04:00) Astrakhan Standard Time",
+        "(UTC+04:00) Azerbaijan Standard Time",
+        "(UTC+04:00) Russia Time Zone 3",
+        "(UTC+04:00) Mauritius Standard Time",
+        "(UTC+04:00) Saratov Standard Time",
+        "(UTC+04:00) Georgian Standard Time",
+        "(UTC+04:00) Caucasus Standard Time",
+        "(UTC+04:30) Afghanistan Standard Time",
+        "(UTC+05:00) West Asia Standard Time",
+        "(UTC+05:00) Ekaterinburg Standard Time",
+        "(UTC+05:00) Pakistan Standard Time",
+        "(UTC+05:30) India Standard Time",
+        "(UTC+05:30) Sri Lanka Standard Time",
+        "(UTC+05:45) Nepal Standard Time",
+        "(UTC+06:00) Central Asia Standard Time",
+        "(UTC+06:00) Bangladesh Standard Time",
+        "(UTC+06:00) Omsk Standard Time",
+        "(UTC+06:30) Myanmar Standard Time",
+        "(UTC+07:00) SE Asia Standard Time",
+        "(UTC+07:00) Altai Standard Time",
+        "(UTC+07:00) W. Mongolia Standard Time",
+        "(UTC+07:00) North Asia Standard Time",
+        "(UTC+07:00) N. Central Asia Standard Time",
+        "(UTC+07:00) Tomsk Standard Time",
+        "(UTC+08:00) China Standard Time",
+        "(UTC+08:00) North Asia East Standard Time",
+        "(UTC+08:00) Singapore Standard Time",
+        "(UTC+08:00) W. Australia Standard Time",
+        "(UTC+08:00) Taipei Standard Time",
+        "(UTC+08:00) Ulaanbaatar Standard Time",
+        "(UTC+08:30) North Korea Standard Time",
+        "(UTC+08:45) Aus Central W. Standard Time",
+        "(UTC+09:00) Transbaikal Standard Time",
+        "(UTC+09:00) Tokyo Standard Time",
+        "(UTC+09:00) Korea Standard Time",
+        "(UTC+09:00) Yakutsk Standard Time",
+        "(UTC+09:30) Cen. Australia Standard Time",
+        "(UTC+09:30) AUS Central Standard Time",
+        "(UTC+10:00) E. Australia Standard Time",
+        "(UTC+10:00) AUS Eastern Standard Time",
+        "(UTC+10:00) West Pacific Standard Time",
+        "(UTC+10:00) Tasmania Standard Time",
+        "(UTC+10:00) Vladivostok Standard Time",
+        "(UTC+10:30) Lord Howe Standard Time",
+        "(UTC+11:00) Bougainville Standard Time",
+        "(UTC+11:00) Russia Time Zone 10",
+        "(UTC+11:00) Magadan Standard Time",
+        "(UTC+11:00) Norfolk Standard Time",
+        "(UTC+11:00) Sakhalin Standard Time",
+        "(UTC+11:00) Central Pacific Standard Time",
+        "(UTC+12:00) Russia Time Zone 11",
+        "(UTC+12:00) New Zealand Standard Time",
+        "(UTC+12:00) UTC+12",
+        "(UTC+12:00) Fiji Standard Time",
+        "(UTC+12:00) Kamchatka Standard Time",
+        "(UTC+12:45) Chatham Islands Standard Time",
+        "(UTC+13:00) UTC+13",
+        "(UTC+13:00) Tonga Standard Time",
+        "(UTC+13:00) Samoa Standard Time",
+        "(UTC+14:00) Line Islands Standard Time"
+      ],
+      "metadata": {
+        "description": "Timezone to use for this System",
+        "group": "Customization Options",
+        "order": 2,
+        "label": "Timezone",
+        "question": "What timezone do you want to use for this server?",
+        "skip": "never"
+      }
+    },
+    "applyOSPatches": {
+      "defaultValue": "No",
+      "metadata": {
+        "description": "Choose if you want to install OS patches (adds approx 30 minutes to deployment time)",
+        "group": "Customization Options",
+        "order": 3,
+        "label": "Apply OS Patches",
+        "question": "Do you want to apply missing OS patches?",
+        "skip": "never"
+      },
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "type": "string"
+    },
+    "antiMalware": {
+      "defaultValue": "No",
+      "metadata": {
+        "description": "Specify if you need the new VMs to have anti-malware extension installed (recommended)",
+        "group": "Customization Options",
+        "order": 4,
+        "label": "Antimalware",
+        "question": "Do you want to install microsoft anti-malware agent (windows only)?",
+        "skip": "never"
+      },
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "type": "string"
+    },
+    "logAnalytics": {
+      "defaultValue": "No",
+      "metadata": {
+        "description": "Specify if you need the new VMs to connect to an OMS workspace.",
+        "group": "Customization Options",
+        "order": 5,
+        "label": "OMS Agent",
+        "question": "Do you want to install the OMS agent?",
+        "skip": "never"
+      },
+      "allowedValues": [
+        "Yes",
+        "No"
+      ],
+      "type": "string"
+    },
+    "workspaceId": {
+      "defaultValue": "guid",
+      "metadata": {
+        "description": "Log Analytics workspace id",
+        "group": "Customization Options",
+        "order": 6,
+        "label": "Workspace ID",
+        "question": "Workspace ID",
+        "skip": "never"
+      },
+      "type": "string"
+    },
+    "workspaceKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Log Analytics workspace key",
+        "group": "Customization Options",
+        "order": 7,
+        "label": "Workspace Key",
+        "question": "Workspace Key",
+        "skip": "never"
+      },
+      "defaultValue": "key"
+    },
+    "environment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "Test",
+        "Development",
+        "Disaster Recovery",
+        "Q/A",
+        "Other"
+      ],
+      "metadata": {
+        "description": "The Environment type we are building",
+        "group": "Tags",
+        "order": 1,
+        "question": "Please enter environment type : "
+      },
+      "defaultValue": "Production"
+    },
+    "buildDate": {
+      "type": "string",
+      "metadata": {
+        "description": "The date of this build",
+        "group": "Tags",
+        "order": 2,
+        "question": "Please enter todays date (mm/dd/yyyy) : "
+      },
+      "defaultValue": "mm/dd/yyyy"
+    },
+    "buildBy": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the person who build this environment",
+        "group": "Tags",
+        "order": 3,
+        "question": "Please enter your full name : "
+      },
+      "defaultValue": "First Last"
+    },
+    "RaxAutomationExclude": {
+      "type": "string",
+      "allowedValues": [
+        "None",
+        "Monitoring",
+        "Passport",
+        "Antimalware"
+      ],
+      "metadata": {
+        "description": "Select the automation type you will like to exclude for this VM",
+        "group": "Tags",
+        "order": 4,
+        "label": "Automation Exluce",
+        "question": "Choose the type of automation you will like to exclude this from"
+      },
+      "defaultValue": "None"
+    },
+    "assetLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The asset location",
+        "group": "Deployment Settings",
+        "order": 1,
+        "question": "Enter Asset Location"
+      },
+      "defaultValue": "https://raxtemplates.blob.core.windows.net/master/"
+    },
+    "sasToken": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The sas token required to access the assets",
+        "group": "Deployment Settings",
+        "order": 2,
+        "label": "SAS Token",
+        "question": "Enter Asset Location"
+      }
+    }
+  },
+  "variables": {
+    "timeZoneHash": {
+      "(UTC-12:00) Dateline Standard Time": "Dateline Standard Time",
+      "(UTC-11:00) UTC-11": "UTC-11",
+      "(UTC-10:00) Aleutian Standard Time": "Aleutian Standard Time",
+      "(UTC-10:00) Hawaiian Standard Time": "Hawaiian Standard Time",
+      "(UTC-09:30) Marquesas Standard Time": "Marquesas Standard Time",
+      "(UTC-09:00) Alaskan Standard Time": "Alaskan Standard Time",
+      "(UTC-09:00) UTC-09": "UTC-09",
+      "(UTC-08:00) Pacific Standard Time (Mexico)": "Pacific Standard Time (Mexico)",
+      "(UTC-08:00) UTC-08": "UTC-08",
+      "(UTC-08:00) Pacific Standard Time": "Pacific Standard Time",
+      "(UTC-07:00) US Mountain Standard Time": "US Mountain Standard Time",
+      "(UTC-07:00) Mountain Standard Time (Mexico)": "Mountain Standard Time (Mexico)",
+      "(UTC-07:00) Mountain Standard Time": "Mountain Standard Time",
+      "(UTC-06:00) Central America Standard Time": "Central America Standard Time",
+      "(UTC-06:00) Central Standard Time": "Central Standard Time",
+      "(UTC-06:00) Easter Island Standard Time": "Easter Island Standard Time",
+      "(UTC-06:00) Central Standard Time (Mexico)": "Central Standard Time (Mexico)",
+      "(UTC-06:00) Canada Central Standard Time": "Canada Central Standard Time",
+      "(UTC-05:00) SA Pacific Standard Time": "SA Pacific Standard Time",
+      "(UTC-05:00) Eastern Standard Time (Mexico)": "Eastern Standard Time (Mexico)",
+      "(UTC-05:00) Eastern Standard Time": "Eastern Standard Time",
+      "(UTC-05:00) Haiti Standard Time": "Haiti Standard Time",
+      "(UTC-05:00) Cuba Standard Time": "Cuba Standard Time",
+      "(UTC-05:00) US Eastern Standard Time": "US Eastern Standard Time",
+      "(UTC-04:00) Paraguay Standard Time": "Paraguay Standard Time",
+      "(UTC-04:00) Atlantic Standard Time": "Atlantic Standard Time",
+      "(UTC-04:00) Venezuela Standard Time": "Venezuela Standard Time",
+      "(UTC-04:00) Central Brazilian Standard Time": "Central Brazilian Standard Time",
+      "(UTC-04:00) SA Western Standard Time": "SA Western Standard Time",
+      "(UTC-04:00) Pacific SA Standard Time": "Pacific SA Standard Time",
+      "(UTC-04:00) Turks And Caicos Standard Time": "Turks And Caicos Standard Time",
+      "(UTC-03:30) Newfoundland Standard Time": "Newfoundland Standard Time",
+      "(UTC-03:00) Tocantins Standard Time": "Tocantins Standard Time",
+      "(UTC-03:00) E. South America Standard Time": "E. South America Standard Time",
+      "(UTC-03:00) SA Eastern Standard Time": "SA Eastern Standard Time",
+      "(UTC-03:00) Argentina Standard Time": "Argentina Standard Time",
+      "(UTC-03:00) Greenland Standard Time": "Greenland Standard Time",
+      "(UTC-03:00) Montevideo Standard Time": "Montevideo Standard Time",
+      "(UTC-03:00) Saint Pierre Standard Time": "Saint Pierre Standard Time",
+      "(UTC-03:00) Bahia Standard Time": "Bahia Standard Time",
+      "(UTC-02:00) UTC-02": "UTC-02",
+      "(UTC-02:00) Mid-Atlantic Standard Time": "Mid-Atlantic Standard Time",
+      "(UTC-01:00) Azores Standard Time": "Azores Standard Time",
+      "(UTC-01:00) Cape Verde Standard Time": "Cape Verde Standard Time",
+      "(UTC) UTC": "UTC",
+      "(UTC+00:00) Morocco Standard Time": "Morocco Standard Time",
+      "(UTC+00:00) GMT Standard Time": "GMT Standard Time",
+      "(UTC+00:00) Greenwich Standard Time": "Greenwich Standard Time",
+      "(UTC+01:00) W. Europe Standard Time": "W. Europe Standard Time",
+      "(UTC+01:00) Central Europe Standard Time": "Central Europe Standard Time",
+      "(UTC+01:00) Romance Standard Time": "Romance Standard Time",
+      "(UTC+01:00) Central European Standard Time": "Central European Standard Time",
+      "(UTC+01:00) W. Central Africa Standard Time": "W. Central Africa Standard Time",
+      "(UTC+01:00) Namibia Standard Time": "Namibia Standard Time",
+      "(UTC+02:00) Jordan Standard Time": "Jordan Standard Time",
+      "(UTC+02:00) GTB Standard Time": "GTB Standard Time",
+      "(UTC+02:00) Middle East Standard Time": "Middle East Standard Time",
+      "(UTC+02:00) Egypt Standard Time": "Egypt Standard Time",
+      "(UTC+02:00) E. Europe Standard Time": "E. Europe Standard Time",
+      "(UTC+02:00) Syria Standard Time": "Syria Standard Time",
+      "(UTC+02:00) West Bank Standard Time": "West Bank Standard Time",
+      "(UTC+02:00) South Africa Standard Time": "South Africa Standard Time",
+      "(UTC+02:00) FLE Standard Time": "FLE Standard Time",
+      "(UTC+02:00) Israel Standard Time": "Israel Standard Time",
+      "(UTC+02:00) Kaliningrad Standard Time": "Kaliningrad Standard Time",
+      "(UTC+02:00) Libya Standard Time": "Libya Standard Time",
+      "(UTC+03:00) Arabic Standard Time": "Arabic Standard Time",
+      "(UTC+03:00) Turkey Standard Time": "Turkey Standard Time",
+      "(UTC+03:00) Arab Standard Time": "Arab Standard Time",
+      "(UTC+03:00) Belarus Standard Time": "Belarus Standard Time",
+      "(UTC+03:00) Russian Standard Time": "Russian Standard Time",
+      "(UTC+03:00) E. Africa Standard Time": "E. Africa Standard Time",
+      "(UTC+03:30) Iran Standard Time": "Iran Standard Time",
+      "(UTC+04:00) Arabian Standard Time": "Arabian Standard Time",
+      "(UTC+04:00) Astrakhan Standard Time": "Astrakhan Standard Time",
+      "(UTC+04:00) Azerbaijan Standard Time": "Azerbaijan Standard Time",
+      "(UTC+04:00) Russia Time Zone 3": "Russia Time Zone 3",
+      "(UTC+04:00) Mauritius Standard Time": "Mauritius Standard Time",
+      "(UTC+04:00) Saratov Standard Time": "Saratov Standard Time",
+      "(UTC+04:00) Georgian Standard Time": "Georgian Standard Time",
+      "(UTC+04:00) Caucasus Standard Time": "Caucasus Standard Time",
+      "(UTC+04:30) Afghanistan Standard Time": "Afghanistan Standard Time",
+      "(UTC+05:00) West Asia Standard Time": "West Asia Standard Time",
+      "(UTC+05:00) Ekaterinburg Standard Time": "Ekaterinburg Standard Time",
+      "(UTC+05:00) Pakistan Standard Time": "Pakistan Standard Time",
+      "(UTC+05:30) India Standard Time": "India Standard Time",
+      "(UTC+05:30) Sri Lanka Standard Time": "Sri Lanka Standard Time",
+      "(UTC+05:45) Nepal Standard Time": "Nepal Standard Time",
+      "(UTC+06:00) Central Asia Standard Time": "Central Asia Standard Time",
+      "(UTC+06:00) Bangladesh Standard Time": "Bangladesh Standard Time",
+      "(UTC+06:00) Omsk Standard Time": "Omsk Standard Time",
+      "(UTC+06:30) Myanmar Standard Time": "Myanmar Standard Time",
+      "(UTC+07:00) SE Asia Standard Time": "SE Asia Standard Time",
+      "(UTC+07:00) Altai Standard Time": "Altai Standard Time",
+      "(UTC+07:00) W. Mongolia Standard Time": "W. Mongolia Standard Time",
+      "(UTC+07:00) North Asia Standard Time": "North Asia Standard Time",
+      "(UTC+07:00) N. Central Asia Standard Time": "N. Central Asia Standard Time",
+      "(UTC+07:00) Tomsk Standard Time": "Tomsk Standard Time",
+      "(UTC+08:00) China Standard Time": "China Standard Time",
+      "(UTC+08:00) North Asia East Standard Time": "North Asia East Standard Time",
+      "(UTC+08:00) Singapore Standard Time": "Singapore Standard Time",
+      "(UTC+08:00) W. Australia Standard Time": "W. Australia Standard Time",
+      "(UTC+08:00) Taipei Standard Time": "Taipei Standard Time",
+      "(UTC+08:00) Ulaanbaatar Standard Time": "Ulaanbaatar Standard Time",
+      "(UTC+08:30) North Korea Standard Time": "North Korea Standard Time",
+      "(UTC+08:45) Aus Central W. Standard Time": "Aus Central W. Standard Time",
+      "(UTC+09:00) Transbaikal Standard Time": "Transbaikal Standard Time",
+      "(UTC+09:00) Tokyo Standard Time": "Tokyo Standard Time",
+      "(UTC+09:00) Korea Standard Time": "Korea Standard Time",
+      "(UTC+09:00) Yakutsk Standard Time": "Yakutsk Standard Time",
+      "(UTC+09:30) Cen. Australia Standard Time": "Cen. Australia Standard Time",
+      "(UTC+09:30) AUS Central Standard Time": "AUS Central Standard Time",
+      "(UTC+10:00) E. Australia Standard Time": "E. Australia Standard Time",
+      "(UTC+10:00) AUS Eastern Standard Time": "AUS Eastern Standard Time",
+      "(UTC+10:00) West Pacific Standard Time": "West Pacific Standard Time",
+      "(UTC+10:00) Tasmania Standard Time": "Tasmania Standard Time",
+      "(UTC+10:00) Vladivostok Standard Time": "Vladivostok Standard Time",
+      "(UTC+10:30) Lord Howe Standard Time": "Lord Howe Standard Time",
+      "(UTC+11:00) Bougainville Standard Time": "Bougainville Standard Time",
+      "(UTC+11:00) Russia Time Zone 10": "Russia Time Zone10",
+      "(UTC+11:00) Magadan Standard Time": "Magadan Standard Time",
+      "(UTC+11:00) Norfolk Standard Time": "Norfolk Standard Time",
+      "(UTC+11:00) Sakhalin Standard Time": "Sakhalin Standard Time",
+      "(UTC+11:00) Central Pacific Standard Time": "Central Pacific Standard Time",
+      "(UTC+12:00) Russia Time Zone 11": "Russia Time Zone11",
+      "(UTC+12:00) New Zealand Standard Time": "New Zealand Standard Time",
+      "(UTC+12:00) UTC+12": "UTC+12",
+      "(UTC+12:00) Fiji Standard Time": "Fiji Standard Time",
+      "(UTC+12:00) Kamchatka Standard Time": "Kamchatka Standard Time",
+      "(UTC+12:45) Chatham Islands Standard Time": "Chatham Islands Standard Time",
+      "(UTC+13:00) UTC+13": "UTC+13",
+      "(UTC+13:00) Tonga Standard Time": "Tonga Standard Time",
+      "(UTC+13:00) Samoa Standard Time": "Samoa Standard Time",
+      "(UTC+14:00) Line Islands Standard Time": "Line Islands Standard Time"
+    },
+    "domainJoinHash": {
+      "Yes": "[concat(parameters('assetLocation'),'resources/extensions/joinDomain-ON.json')]",
+      "No": "[concat(parameters('assetLocation'),'resources/extensions/joinDomain-OFF.json')]"
+    },
+    "enableAntiMalwareHash": {
+      "Yes": "[concat(parameters('assetLocation'),'resources/extensions/antimalware-ON.json')]",
+      "No": "[concat(parameters('assetLocation'),'resources/extensions/antimalware-OFF.json')]"
+    },
+    "logAnalyticsHash": {
+      "Yes": "[concat(parameters('assetLocation'),'resources/extensions/oms-windows-ON.json')]",
+      "No": "[concat(parameters('assetLocation'),'resources/extensions/oms-OFF.json')]"
+    },
+    "bginfoTemplateURL": "[concat(parameters('assetLocation'),'resources/extensions/bginfo-ON.json')]",
+    "customizeOS": "[concat(parameters('assetLocation'),'resources/extensions/dsc-mssql-standalone.json')]",
+    "customizeSQL": "[concat(parameters('assetLocation'),'resources/extensions/cse-mssql-standalone.json')]",
+    "enableDiagnostics": "[concat(parameters('assetLocation'),'resources/extensions/diagnosticsWindows.json')]",
+
+    "osHash": {
+      "Windows 2012 R2 SQL Server 2014 SP2 Express": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2014SP2-WS2012R2",
+        "imageSKU": "Express",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2014 SP2 Web": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2014SP2-WS2012R2",
+        "imageSKU": "Web",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2014 SP2 Standard": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2014SP2-WS2012R2",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2014 SP2 Standard - BYOL": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2014SP2-WS2012R2-BYOL",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2014 SP2 Enterprise": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2014SP2-WS2012R2",
+        "imageSKU": "Enterprise",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2014 SP2 Enterprise - BYOL": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2014SP2-WS2012R2-BYOL",
+        "imageSKU": "Enterprise",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2016 Express": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016-WS2012R2",
+        "imageSKU": "Express",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2016 Web": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016-WS2012R2",
+        "imageSKU": "Web",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2016 Standard": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016-WS2012R2",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2016 Standard - BYOL": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016-WS2012R2-BYOL",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2016 Enterprise": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016-WS2012R2",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2012 R2 SQL Server 2016 Enterprise - BYOL": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016-WS2012R2-BYOL",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2016 SQL Server 2016 SP1 Express": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016SP1-WS2016",
+        "imageSKU": "Express",
+        "version": "latest"
+      },
+      "Windows 2016 SQL Server 2016 SP1 Web": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016SP1-WS2016",
+        "imageSKU": "Web",
+        "version": "latest"
+      },
+      "Windows 2016 SQL Server 2016 SP1 Standard": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016SP1-WS2016",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2016 SQL Server 2016 SP1 Standard - BYOL": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016SP1-WS2016-BYOL",
+        "imageSKU": "Standard",
+        "version": "latest"
+      },
+      "Windows 2016 SQL Server 2016 SP1 Enterprise": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016SP1-WS2016",
+        "imageSKU": "Enterprise",
+        "version": "latest"
+      },
+      "Windows 2016 SQL Server 2016 SP1 Enterprise - BYOL": {
+        "imagePublisher": "MicrosoftSQLServer",
+        "imageOffer": "SQL2016SP1-WS2016-BYOL",
+        "imageSKU": "Enterprise",
+        "version": "latest"
+      }
+    },
+    "storageAccountHash": {
+      "New": {
+        "availabilitySetHash": {
+          "NewOrExisting": {
+            "storageTemplateURL": "[concat(parameters('assetLocation'),'storage/storageaccount.json')]",
+            "AvailabilitySetTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/availabilityset-ON.json')]",
+            "VMTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/vm-availabilityset-ON.json')]"
+          },
+          "None": {
+            "storageTemplateURL": "[concat(parameters('assetLocation'),'storage/storageaccount.json')]",
+            "AvailabilitySetTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/availabilityset-OFF.json')]",
+            "VMTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/vm-availabilityset-OFF.json')]"
+          }
+        }
+      },
+      "ManagedDisk": {
+        "availabilitySetHash": {
+          "NewOrExisting": {
+            "storageTemplateURL": "[concat(parameters('assetLocation'),'storage/storageaccount-OFF.json')]",
+            "AvailabilitySetTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/availabilityset-md-ON.json')]",
+            "VMTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/vm-availabilityset-md-ON.json')]"
+          },
+          "None": {
+            "storageTemplateURL": "[concat(parameters('assetLocation'),'storage/storageaccount-OFF.json')]",
+            "AvailabilitySetTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/availabilityset-OFF.json')]",
+            "VMTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/vm-availabilityset-md-OFF.json')]"
+            
+          }
+        }
+      }
+    },
+    "storageSuffix": "[toLower(replace(parameters('vmName'),'-',''))]",
+    "myAvailabilitySetTemplateURL": "[variables('storageAccountHash')[parameters('storageAccountOption')].availabilitySetHash[parameters('availabilitySetOption')].AvailabilitySetTemplateURL]",
+    "myVMTemplateURL": "[variables('storageAccountHash')[parameters('storageAccountOption')].availabilitySetHash[parameters('availabilitySetOption')].VMTemplateURL]",
+    "myStorageTemplateURL": "[variables('storageAccountHash')[parameters('storageAccountOption')].availabilitySetHash[parameters('availabilitySetOption')].storageTemplateURL]",
+    "imagePublisher": "[concat(variables('osHash')[parameters('operatingSystem')].imagePublisher)]",
+    "imageOffer": "[concat(variables('osHash')[parameters('operatingSystem')].imageOffer)]",
+    "imageSKU": "[concat(variables('osHash')[parameters('operatingSystem')].imageSKU)]",
+    "imageVersion": "[concat(variables('osHash')[parameters('operatingSystem')].version)]",
+    "vnetId": "[resourceId(parameters('vnetRG'),'Microsoft.Network/virtualnetworks',parameters('vnetName'))]",
+    "subnetRef": "[concat(variables('vnetId'),'/subnets/',parameters('subnetName'))]",
+    "customerUsername": "[concat(parameters('vmName'),'-adm')]",
+    "nicTemplateURL": "[concat(parameters('assetLocation'),'resources/partials/partial-nic-nolb.json')]",
+    "ConfigData": "[concat(parameters('assetLocation'),'resources/scripts/ConfigDataSQL.psd1')]"
+  },
+  "resources": [{
+      "name": "[concat('DiagnosticStorageAccount-',parameters('vmName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('myStorageTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountType": {
+            "value": "Standard_LRS"
+          },
+          "storageAccountCount": {
+            "value": 1
+          },
+          "storageAccountSuffix": {
+            "value": "diagnostics"
+          },
+          "blobEncryptionEnabled": {
+            "value": "[parameters('blobEncryptionEnabled')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "buildBy": {
+            "value": "[parameters('buildBy')]"
+          },
+          "buildDate": {
+            "value": "[parameters('buildDate')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('StorageAccount-',parameters('vmName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('myStorageTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountType": {
+            "value": "[parameters('storageAccountType')]"
+          },
+          "storageAccountCount": {
+            "value": 1
+          },
+          "startIndex": {
+            "value": 1
+          },
+          "storageAccountSuffix": {
+            "value": "[variables('storageSuffix')]"
+          },
+          "blobEncryptionEnabled": {
+            "value": "[parameters('blobEncryptionEnabled')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "buildBy": {
+            "value": "[parameters('buildBy')]"
+          },
+          "buildDate": {
+            "value": "[parameters('buildDate')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('AvailabilitySet-',parameters('vmName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('myAvailabilitySetTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "availabilitySetName": {
+            "value": "[parameters('availabilitySetName')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "buildBy": {
+            "value": "[parameters('buildBy')]"
+          },
+          "buildDate": {
+            "value": "[parameters('buildDate')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'), '-Nic')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('nicTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "availabilitySetName": {
+            "value": "[parameters('availabilitySetName')]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "subnetRef": {
+            "value": "[variables('subnetRef')]"
+          },
+          "dnsNameforPublicIP": {
+            "value": ""
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "buildBy": {
+            "value": "[parameters('buildBy')]"
+          },
+          "buildDate": {
+            "value": "[parameters('buildDate')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "[concat(parameters('vmName'), '-VM')]",
+      "condition": "[equals(parameters('storageAccountOption'),'New')]",
+      "dependsOn": [
+        "[concat('DiagnosticStorageAccount-',parameters('vmName'))]",
+        "[concat('StorageAccount-',parameters('vmName'))]",
+        "[concat('AvailabilitySet-', parameters('vmName'))]",
+        "[concat(parameters('vmName'), '-Nic')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('myVMTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[reference(concat('StorageAccount-',parameters('vmName'))).outputs.storageAccounts.value[0]]"
+          },
+          "diagStorageAccount": {
+            "value": "[reference(concat('DiagnosticStorageAccount-',parameters('vmName'))).outputs.storageAccounts.value[0]]"
+          },
+          "nicRef": {
+            "value": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'), '-nic' ))]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "adminUsername": {
+            "value": "[concat(parameters('vmName'),'-rax')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "sizeOfDataDisksInGB": {
+            "value": "[parameters('dataDiskSize')]"
+          },
+          "numDataDisks": {
+            "value": "[parameters('numDataDisks')]"
+          },
+          "storageAccountType": {
+            "value": "[parameters('storageAccountType')]"
+          },
+          "diskCaching": {
+            "value": "[parameters('diskCaching')]"
+          },
+          "availabilitySetName": {
+            "value": "[parameters('availabilitySetName')]"
+          },
+          "imagePublisher": {
+            "value": "[variables('imagePublisher')]"
+          },
+          "imageOffer": {
+            "value": "[variables('imageOffer')]"
+          },
+          "imageSKU": {
+            "value": "[variables('imageSKU')]"
+          },
+          "imageVersion": {
+            "value": "[variables('imageVersion')]"
+          },
+          "RaxAutomationExclude": {
+            "value": "[parameters('RaxAutomationExclude')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "buildBy": {
+            "value": "[parameters('buildBy')]"
+          },
+          "buildDate": {
+            "value": "[parameters('buildDate')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "[concat(parameters('vmName'), '-VM-MD')]",
+      "condition": "[equals(parameters('storageAccountOption'),'ManagedDisk')]",
+      "dependsOn": [
+        "[concat('DiagnosticStorageAccount-',parameters('vmName'))]",
+        "[concat('StorageAccount-',parameters('vmName'))]",
+        "[concat('AvailabilitySet-', parameters('vmName'))]",
+        "[concat(parameters('vmName'), '-Nic')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('myVMTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[reference(concat('StorageAccount-',parameters('vmName'))).outputs.storageAccounts.value[0]]"
+          },
+          "diagStorageAccount": {
+            "value": "[reference(concat('DiagnosticStorageAccount-',parameters('vmName'))).outputs.storageAccounts.value[0]]"
+          },
+          "nicRef": {
+            "value": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'), '-nic' ))]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "adminUsername": {
+            "value": "[concat(parameters('vmName'),'-rax')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "sizeOfDataDisksInGB": {
+            "value": "[parameters('dataDiskSize')]"
+          },
+          "numDataDisks": {
+            "value": "[parameters('numDataDisks')]"
+          },
+          "storageAccountType": {
+            "value": "[parameters('storageAccountType')]"
+          },
+          "diskCaching": {
+            "value": "[parameters('diskCaching')]"
+          },
+          "availabilitySetName": {
+            "value": "[parameters('availabilitySetName')]"
+          },
+          "imagePublisher": {
+            "value": "[variables('imagePublisher')]"
+          },
+          "imageOffer": {
+            "value": "[variables('imageOffer')]"
+          },
+          "imageSKU": {
+            "value": "[variables('imageSKU')]"
+          },
+          "imageVersion": {
+            "value": "[variables('imageVersion')]"
+          },
+          "RaxAutomationExclude": {
+            "value": "[parameters('RaxAutomationExclude')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "buildBy": {
+            "value": "[parameters('buildBy')]"
+          },
+          "buildDate": {
+            "value": "[parameters('buildDate')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),  '-DomainJoin')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat(parameters('vmName'), '-VM')]",
+        "[concat(parameters('vmName'), '-VM-MD')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('DomainJoinHash')[parameters('joinADDomain')],parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "domainToJoin": {
+            "value": "[parameters('domainToJoin')]"
+          },
+          "OUPath": {
+            "value": "[parameters('organizationalUnit')]"
+          },
+          "domainUsername": {
+            "value": "[parameters('domainAdminUsername')]"
+          },
+          "domainPassword": {
+            "value": "[parameters('domainAdminPassword')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),  '-BGInfo')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat(parameters('vmName'),  '-DomainJoin')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('bginfoTemplateURL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "[concat(parameters('vmName'),  '-Diagnostics')]",
+      "condition": "[equals(parameters('storageAccountOption'),'New')]",
+      "dependsOn": [
+        "[concat(parameters('vmName'),  '-DomainJoin')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('enableDiagnostics'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "vmDiagnosticsStorageAccountName": {
+            "value": "[reference(concat('DiagnosticStorageAccount-',parameters('vmName'))).outputs.storageAccounts.value[0]]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),  '-LogAnalytics')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat(parameters('vmName'),  '-Diagnostics')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('logAnalyticsHash')[parameters('logAnalytics')],parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "workspaceId": {
+            "value": "[parameters('workspaceId')]"
+          },
+          "workspaceKey": {
+            "value": "[parameters('workspaceKey')]"
+          },
+          "vmResourceId": {
+            "value": "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),  '-AntiMalware')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat(parameters('vmName'),  '-Diagnostics')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('enableAntiMalwareHash')[parameters('antiMalware')],parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),  '-CustomizeOS')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat(parameters('vmName'), '-VM')]",
+        "[concat(parameters('vmName'), '-VM-MD')]",
+        "[concat(parameters('vmName'),  '-BGInfo')]",
+        "[concat(parameters('vmName'),  '-Diagnostics')]",
+        "[concat(parameters('vmName'),  '-LogAnalytics')]",
+        "[concat(parameters('vmName'),  '-AntiMalware')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('customizeOS'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "adminUsername": {
+            "value": "[variables('customerUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "configData": {
+            "value": "[variables('ConfigData')]"
+          },
+          "timeZone": {
+            "value": "[variables('timeZoneHash')[parameters('timeZone')]]"
+          },
+          "applyOSPatches": {
+            "value": "[parameters('applyOSPatches')]"
+          },
+          "numDataDisks": {
+            "value": "[parameters('numDataDisks')]"
+          },
+          "sasToken": {
+            "value": "[parameters('sasToken')]"
+          },
+          "assetLocation": {
+            "value": "[parameters('assetLocation')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),  '-CustomizeSQL')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat(parameters('vmName'),  '-CustomizeOS')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('customizeSQL'),parameters('sasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "dataDir": {
+            "value": "S:\\DATA"
+          },
+          "LogDir": {
+            "value": "T:\\LOG"
+          },
+          "sasToken": {
+            "value": "[parameters('sasToken')]"
+          },
+          "assetLocation": {
+            "value": "[parameters('assetLocation')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "vmName": {
+      "type": "string",
+      "value": "[parameters('vmName')]"
+    },
+    "customerUsername": {
+      "type": "string",
+      "value": "[variables('customerUsername')]"
+    },
+    "privateIP": {
+      "type": "string",
+      "value": "[reference(concat(parameters('vmName'),'-nic' )).outputs.privateIP.value ]"
+    }
+  }
+}

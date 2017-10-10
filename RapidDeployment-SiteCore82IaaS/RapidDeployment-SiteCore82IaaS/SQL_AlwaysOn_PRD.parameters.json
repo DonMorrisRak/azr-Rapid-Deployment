@@ -1,0 +1,98 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "operatingSystem": {
+      "value": "Windows 2012 R2 SQL Server 2014 SP2 Enterprise - BYOL"
+    },
+    "vmNamePrefix": {
+      "value": "PRD-VM-SQL-"
+    },
+    "vmSize": {
+      "value": "Standard_DS12_v2"
+    },
+    "witnessVMName": {
+      "value": "PRD-VM-WIT-"
+    },
+    "witnessVMSize": {
+      "value": "Standard_D1_v2"
+    },
+    "availabilitySetName": {
+      "value": "PRD-AS-SQL"
+    },
+    "dataDiskSize": {
+      "value": 1023
+    },
+    "sqlServiceAccountUserName": {
+      "value": "sa"
+    },
+    "sqlServiceAccountPassword": {
+      "value": ""
+    },
+    "dataBaseNames": {
+      "value": [
+        "sitecore"
+      ]
+    },
+    "vnetRG": {
+      "value": "NEU-STCR-RSG-ALL-PRD"
+    },
+    "vnetName": {
+      "value": "NEU-VNET01"
+    },
+    "subnetName": {
+      "value": "NEU-VNET01-SQL-PRD"
+    },
+    "adVMName": {
+      "value": "PRD-VM-ADS-1"
+    },
+    "domainToJoin": {
+      "value": "clouddomain.com"
+    },
+    "organizationalUnit": {
+      "value": ""
+    },
+    "domainAdminUsername": {
+      "value": "administrator"
+    },
+    "domainAdminPassword": {
+      "value": "Secur3string!!"
+    },
+    "timeZone": {
+      "value": "(UTC) UTC"
+    },
+    "applyOSPatches": {
+      "value": "Yes"
+    },
+    "antiMalware": {
+      "value": "Yes"
+    },
+    "logAnalytics": {
+      "value": "Yes"
+    },
+    "workspaceId": {
+      "value": ""
+    },
+    "workspaceKey": {
+      "value": ""
+    },
+    "environment": {
+      "value": "Production"
+    },
+    "buildDate": {
+      "value": "10 October 2017"
+    },
+    "buildBy": {
+      "value": "Don Morris"
+    },
+    "RaxAutomationExclude": {
+      "value": "None"
+    },
+    "assetLocation": {
+      "value": "https://raxtemplates.blob.core.windows.net/master/"
+    },
+    "sasToken": {
+      "value": ""
+    }
+  }
+}

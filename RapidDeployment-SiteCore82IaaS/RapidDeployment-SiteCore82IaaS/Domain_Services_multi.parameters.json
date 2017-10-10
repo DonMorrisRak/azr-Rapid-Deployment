@@ -1,0 +1,78 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "operatingSystem": {
+            "value": "Windows Server 2012 R2"
+        },
+        "vmNamePrefix": {
+            "value": "PRD-VM-ADS-"
+        },
+        "vmSize": {
+            "value": "Standard_D1_v2"
+        },
+        "dataDiskSize": {
+            "value": 100
+        },
+        "availabilitySetName": {
+            "value": "PRD-AS-ADS"
+        },
+        "vnetRG": {
+            "value": "NEU-STCR-RSG-ALL-PRD"
+        },
+        "vnetName": {
+            "value": "NOC-VNET01"
+        },
+        "subnetName": {
+            "value": "NEU-VNET01-AD-PRD"
+        },
+        "primaryDCIp": {
+            "value": "172.16.192.4"
+        },
+        "secondaryDCIp": {
+            "value": "172.16.192.5"
+        },
+        "domainName": {
+            "value": "clouddomain.com"
+        },
+        "netbiosName": {
+            "value": "cloud"
+        },
+        "domainAdminPassword": {
+            "value": "Secur3string!!"
+        },
+        "timeZone": {
+            "value": "(UTC) UTC"
+        },
+        "applyOSPatches": {
+            "value": "Yes"
+        },
+        "antiMalware": {
+            "value": "Yes"
+        },
+        "logAnalytics": {
+            "value": "Yes"
+        },
+        "workspaceId": {
+            "value": ""
+        },
+        "workspaceKey": {
+            "value": ""
+        },
+      "environment": {
+        "value": "Production"
+      },
+        "buildDate": {
+            "value": "19 September 2017"
+        },
+        "buildBy": {
+            "value": "Don Morris"
+        },
+        "assetLocation": {
+            "value": "https://raxtemplates.blob.core.windows.net/master/"
+        },
+        "sasToken": {
+            "value": ""
+        }
+    }
+}
